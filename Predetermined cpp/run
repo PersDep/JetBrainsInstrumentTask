@@ -1,0 +1,3 @@
+#!/bin/bash
+make
+java -Djava.library.path=. com_example_SomeClass

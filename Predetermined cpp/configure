@@ -1,0 +1,23 @@
+#!/bin/bash
+RES_PATH=""
+
+ARG_PATH=${1:17}
+if [ "$ARG_PATH" != "" ]; then
+    RES_PATH="-I"$ARG_PATH"/include"
+else
+    FIND_PATH=$(locate include/jni.h)
+    if [ "$FIND_PATH" != "" ]; then
+        RES_PATH="-I"$(echo $FIND_PATH | rev | cut -c 7- | rev)
+    else
+        echo "Didn't find JDK!"
+        exit
+    fi
+fi
+
+echo LDFLAGS=$RES_PATH > Makefile
+echo CFLAGS=-shared -fPIC -o >> Makefile
+echo >> Makefile
+echo all: >> Makefile
+echo $'\t'"javac com_example_SomeClass.java" >> Makefile
+echo $'\t'"javah com_example_SomeClass" >> Makefile
+echo $'\t'"g++ \$(LDFLAGS) \$(CFLAGS) libcom_example_SomeClass.so com_example_SomeClass.cpp" >> Makefile

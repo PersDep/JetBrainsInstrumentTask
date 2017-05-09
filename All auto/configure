@@ -1,0 +1,31 @@
+#!/bin/bash
+javac com_example_SomeClass.java
+javah com_example_SomeClass
+
+RES_PATH=""
+
+ARG_PATH=${1:17}
+if [ "$ARG_PATH" != "" ]; then
+    RES_PATH="-I"$ARG_PATH"/include"
+else
+    FIND_PATH=$(locate include/jni.h)
+    if [ "$FIND_PATH" != "" ]; then
+        RES_PATH="-I"$(echo $FIND_PATH | rev | cut -c 7- | rev)
+    else
+        echo "Didn't find JDK!"
+        exit
+    fi
+fi
+
+echo LDFLAGS=$RES_PATH > Makefile
+echo CFLAGS=-shared -fPIC -o >> Makefile
+echo >> Makefile
+echo all: >> Makefile
+echo $'\t'"g++ \$(LDFLAGS) \$(CFLAGS) libcom_example_SomeClass.so com_example_SomeClass.cpp" >> Makefile
+
+echo "#include \"com_example_SomeClass.h\"" > com_example_SomeClass.cpp
+echo >> com_example_SomeClass.cpp
+cat com_example_SomeClass.h | grep JNIEXPORT >> com_example_SomeClass.cpp
+echo "  (JNIEnv *env, jclass clazz) {" >> com_example_SomeClass.cpp
+echo "    env->FatalError(\"Some java exception\");" >> com_example_SomeClass.cpp
+echo } >> com_example_SomeClass.cpp
