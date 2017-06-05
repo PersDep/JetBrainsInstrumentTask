@@ -1,0 +1,3 @@
+#!/bin/bash
+make install
+java -Djava.library.path=./usr/local/lib com_example_SomeClass
