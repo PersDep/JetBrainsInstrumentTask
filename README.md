@@ -1,5 +1,7 @@
 # JetBrainsInstrumentTask
 
+Решение в папке Autotools - решение с помощью средств Autotools.
+
 Решение в папке "Predetermined cpp" соответствует заданию.
 (Запуск ./configure генерирует Makefile, запуск ./run выполняет make и затем запускает результат.)
 
