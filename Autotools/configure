@@ -760,6 +760,7 @@ ac_user_opts='
 enable_option_checking
 enable_shared
 enable_static
+with_java_home
 with_pic
 enable_fast_install
 with_aix_soname
@@ -1417,6 +1418,7 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-java-home=DIR    use specific JDK
   --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
                           both]
   --with-aix-soname=aix|svr4|both
@@ -2254,8 +2256,6 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-ARG_PATH="${1:17}"
-DESTDIR_PATH=$(pwd)
 
 # Check whether --enable-shared was given.
 if test "${enable_shared+set}" = set; then :
@@ -2318,6 +2318,12 @@ fi
 
 
 
+
+
+# Check whether --with-java-home was given.
+if test "${with_java_home+set}" = set; then :
+  withval=$with_java_home; ARG_PATH=$with_java_home
+fi
 
 ac_aux_dir=
 for ac_dir in "$srcdir" "$srcdir/.." "$srcdir/../.."; do
@@ -15679,28 +15685,40 @@ fi
 
 
 RES_PATH=""
+JAVA_HOME_PATH=""
 
 if
 test "$ARG_PATH" != ""; then
+    JAVA_HOME_PATH=$ARG_PATH
     RES_PATH="-I"$ARG_PATH"/include"
 else
-    FIND_PATH=$(locate include/jni.h)
+    FIND_PATH=$JAVA_HOME
     if
-test "$FIND_PATH" != ""; then
-        RES_PATH="-I"$(echo $FIND_PATH | rev | cut -c 7- | rev)
+    test "$FIND_PATH" != ""; then
+        JAVA_HOME_PATH=$FIND_PATH
+        RES_PATH="-I"$FIND_PATH"/include"
     else
-        echo "Didn't find JDK!"
-        exit
+        SCR_PATH=$(jrunscript -e 'java.lang.System.out.println(java.lang.System.getProperty("java.home"))')
+        if
+        test "$SCR_PATH" != ""; then
+            JAVA_HOME_PATH=$SCR_PATH"/.."
+            RES_PATH="-I"$SCR_PATH"/../include"
+        else
+            echo "Didn't find JDK!"
+            exit
+        fi
     fi
 fi
 
 DEFAULT_INCLUDES=$RES_PATH
 
+
+DESTDIR_PATH=$(pwd)
 DESTDIR=$DESTDIR_PATH
 
 
-javac com_example_SomeClass.java
-javah com_example_SomeClass
+${JAVA_HOME_PATH}/bin/javac com_example_SomeClass.java
+${JAVA_HOME_PATH}/bin/javah com_example_SomeClass
 
 ac_config_files="$ac_config_files Makefile"
 
