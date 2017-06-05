@@ -15095,19 +15095,19 @@ JAVA_HOME_PATH=""
 if
 test "$ARG_PATH" != ""; then
     JAVA_HOME_PATH=$ARG_PATH
-    RES_PATH="-I"$ARG_PATH"/include"
+    RES_PATH=-I$ARG_PATH/include
 else
     FIND_PATH=$JAVA_HOME
     if
     test "$FIND_PATH" != ""; then
         JAVA_HOME_PATH=$FIND_PATH
-        RES_PATH="-I"$FIND_PATH"/include"
+        RES_PATH=-I$FIND_PATH/include
     else
         SCR_PATH=$(jrunscript -e 'java.lang.System.out.println(java.lang.System.getProperty("java.home"))')
         if
         test "$SCR_PATH" != ""; then
-            JAVA_HOME_PATH=$SCR_PATH"/.."
-            RES_PATH="-I"$SCR_PATH"/../include"
+            JAVA_HOME_PATH=$SCR_PATH/..
+            RES_PATH=-I$SCR_PATH/../include
         else
             echo "Didn't find JDK!"
             exit
@@ -15115,6 +15115,7 @@ else
     fi
 fi
 
+#AC_SUBST(CPPFLAGS, "$CPPFLAGS $RES_PATH")
 DEFAULT_INCLUDES=$RES_PATH
 
 
